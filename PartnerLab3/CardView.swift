@@ -26,37 +26,45 @@ struct CardView: View {
         
     var body: some View {
         ZStack {
-            let shape = ZStack {
-                RoundedRectangle(cornerSize: CGSize(width: 6, height: 6))
-                    .foregroundColor(.white)
-                    .border(Color.black, width: 1)
+            Group {
+                Image(image)
+                    .resizable()
                     .frame(width: 60, height: 60)
-                    .padding(0)
-                LinearGradient(
-                        gradient: Gradient(stops: [
-                            .init(color: .init(.sRGB, red:0.611, green:0.31, blue:0.588), location: 0),
-                            .init(color: .init(.sRGB, red:1, green:0.388, blue:0.333), location: 0.5),
-                            .init(color: .init(.sRGB, red:0.984, green:0.663, blue:0.286), location: 1)
-                        ]),
-                        startPoint: .bottom,
-                        endPoint: .top
-                    )
+                    .scaledToFit()
+                    .opacity(isComplete ? 0.5 : 1.0)
+                
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(.white)
+                    .frame(width: 60, height: 60)
+                    .border(.black, width: 1)
+                    .blendMode(.destinationOver)
             }
+            .rotation3DEffect(.degrees(isFaceUp ? 0 : 180), axis: (x: 0, y: 1, z: 0))
+            .opacity(isFaceUp ? 1 : 0)
             
-            Image(image)
-                .resizable()
-                .frame(width: 60, height: 60)
-                .scaledToFit()
-                .opacity(isComplete ? 0.5 : 1)
-            
-            if isFaceUp {
-                shape.opacity(0)
+            Group {
+                let coverGradient = LinearGradient(
+                    gradient: Gradient(stops: [
+                        .init(color: Color(red:156/255, green:79/255, blue:150/255), location: 0),
+                        .init(color: Color(red:255/255, green:99/255, blue:85/255), location: 0.5),
+                        .init(color: Color(red:251/255, green:169/255, blue:73/255), location: 1)
+                    ]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(coverGradient)
+                    .frame(width: 60, height: 60)
+                    .border(.black, width: 1)
             }
-            else {
-                shape.opacity(1)
-            }
-        }.padding(5)
+            .rotation3DEffect(.degrees(isFaceUp ? 180 : 0), axis: (x: 0, y: -1, z: 0))
+            .opacity(isFaceUp ? 0 : 1)
+        }
+        .padding(5)
             .onTapGesture(perform: { flip_function(self) })
+            .animation(.easeOut(duration: 0.4), value: isFaceUp)
+            .opacity(isComplete ? 0.0 : 1.0)
+            .animation(.linear(duration: 0.5), value: isComplete)
     }
 }
 
